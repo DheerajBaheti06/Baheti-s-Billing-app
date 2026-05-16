@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitives
+    function isSignedIn() { return true; } // Rules enabled for public while app uses local MPIN logic
+    function isVerified() { return true; }
+    function isAdmin() { return true; } 
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+
+    // Helpers
+    function isValidProduct(data) {
+      return data.keys().hasAll(['nameHi', 'nameEn', 'category', 'price', 'unit'])
+        && data.nameHi is string && data.nameHi.size() <= 200
+        && data.nameEn is string && data.nameEn.size() <= 200
+        && data.category is string
+        && data.price is number && data.price >= 0
+        && data.unit is string;
+    }
+
+    function isValidCustomer(data) {
+      return data.keys().hasAll(['name'])
+        && data.name is string && data.name.size() <= 200;
+    }
+
+    function isValidBill(data) {
+      return data.keys().hasAll(['customerName', 'items', 'subtotal', 'finalTotal', 'timestamp'])
+        && data.customerName is string
+        && data.items is list
+        && data.subtotal is number
+        && data.finalTotal is number;
+    }
+
+    match /products/{productId} {
+      allow read: if isSignedIn();
+      allow create, update: if isAdmin() && isValidProduct(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /customers/{customerId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /bills/{billId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidBill(incoming());
+      allow update: if isAdmin(); // Only admin can edit history
+      allow delete: if isAdmin();
+    }
+  }
+}

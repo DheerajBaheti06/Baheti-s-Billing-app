@@ -1,0 +1,81 @@
+import { Unit } from '../types';
+
+export const INITIAL_PRODUCTS = [
+  // CATEGORY: आम पापड़
+  { nameHi: 'आम पापड़ कतली', nameEn: 'Aam Papad Katli', category: 'आम पापड़', price: 420, unit: Unit.KG },
+  { nameHi: 'आम पापड़ गोल', nameEn: 'Aam Papad Gol', category: 'आम पापड़', price: 420, unit: Unit.KG },
+  { nameHi: 'आम पापड़ चटपटा', nameEn: 'Aam Papad Chatpata', category: 'आम पापड़', price: 480, unit: Unit.KG },
+  { nameHi: 'टुकड़ी', nameEn: 'Tukdi', category: 'आम पापड़', price: 320, unit: Unit.KG },
+  { nameHi: 'टुकड़ी चटपटा', nameEn: 'Tukdi Chatpata', category: 'आम पापड़', price: 360, unit: Unit.KG },
+
+  // CATEGORY: मसाले
+  { nameHi: 'तीखी मिर्ची पाउडर', nameEn: 'Tikhi Mirchi Powder', category: 'मसाले', price: 360, unit: Unit.KG },
+  { nameHi: 'चपाटा मिर्ची', nameEn: 'Chapata Mirchi', category: 'मसाले', price: 260, unit: Unit.KG },
+  { nameHi: 'धनिया पाउडर', nameEn: 'Dhaniya Powder', category: 'मसाले', price: 240, unit: Unit.KG },
+  { nameHi: 'हल्दी पाउडर', nameEn: 'Haldi Powder', category: 'मसाले', price: 320, unit: Unit.KG },
+  { nameHi: 'अमचूर पाउडर', nameEn: 'Amchur Powder', category: 'मसाले', price: 300, unit: Unit.KG },
+  { nameHi: 'जीरा', nameEn: 'Jeera', category: 'मसाले', price: 400, unit: Unit.KG },
+  { nameHi: 'राई', nameEn: 'Rai', category: 'मसाले', price: 180, unit: Unit.KG },
+
+  // CATEGORY: अचार
+  { nameHi: 'हरि मिर्ची अचार (कटिंग)', nameEn: 'Hari Mirchi Achar (Cutting)', category: 'अचार', price: 400, unit: Unit.KG },
+  { nameHi: 'लाल मिर्ची भरवां अचार', nameEn: 'Lal Mirchi Bharwan Achar', category: 'अचार', price: 400, unit: Unit.KG },
+  { nameHi: 'कैर का अचार', nameEn: 'Kair Ka Achar', category: 'अचार', price: 580, unit: Unit.KG },
+  { nameHi: 'हरि मिर्ची अथाना', nameEn: 'Hari Mirchi Athana', category: 'अचार', price: 400, unit: Unit.KG },
+  { nameHi: 'आम अचार', nameEn: 'Aam Achar', category: 'अचार', price: 400, unit: Unit.KG },
+  { nameHi: 'निम्बू अचार', nameEn: 'Nimbu Achar', category: 'अचार', price: 400, unit: Unit.KG },
+  { nameHi: 'मिक्स अचार', nameEn: 'Mix Achar', category: 'अचार', price: 400, unit: Unit.KG },
+  { nameHi: 'आम मीठा अचार', nameEn: 'Aam Meetha Achar', category: 'अचार', price: 400, unit: Unit.KG },
+  { nameHi: 'नीम्बू मीठा अचार', nameEn: 'Nimbu Meetha Achar', category: 'अचार', price: 400, unit: Unit.KG },
+  { nameHi: 'आम लच्छा', nameEn: 'Aam Lachha', category: 'अचार', price: 400, unit: Unit.KG },
+  { nameHi: 'लेसवा अचार', nameEn: 'Leswa Achar', category: 'अचार', price: 400, unit: Unit.KG },
+
+  // CATEGORY: पापड़
+  { nameHi: 'चावल खिजिया', nameEn: 'Chawal Khijia', category: 'पापड़', price: 260, unit: Unit.KG },
+  { nameHi: 'चावल का लच्छा', nameEn: 'Chawal Ka Lachha', category: 'पापड़', price: 260, unit: Unit.KG },
+  { nameHi: 'चावल की कुरेड़ी', nameEn: 'Chawal Ki Kuredi', category: 'पापड़', price: 260, unit: Unit.KG },
+  { nameHi: 'साबूदाना पापड़', nameEn: 'Sabudana Papad', category: 'पापड़', price: 360, unit: Unit.KG },
+  { nameHi: 'आलू चिप्स', nameEn: 'Aloo Chips', category: 'पापड़', price: 420, unit: Unit.KG },
+  { nameHi: 'आलू पापड़', nameEn: 'Aloo Papad', category: 'पापड़', price: 420, unit: Unit.KG },
+  { nameHi: 'मूंग पापड़ (तीखा / प्लेन)', nameEn: 'Moong Papad (Tikha / Plain)', category: 'पापड़', price: 320, unit: Unit.KG },
+  { nameHi: 'चना पापड़', nameEn: 'Chana Papad', category: 'पापड़', price: 320, unit: Unit.KG },
+  { nameHi: 'मूंग बड़ी गोल', nameEn: 'Moong Bari Gol', category: 'पापड़', price: 340, unit: Unit.KG },
+  { nameHi: 'मूंग बड़ी लम्बी', nameEn: 'Moong Bari Lambi', category: 'पापड़', price: 320, unit: Unit.KG },
+  { nameHi: 'रखिया बड़ी', nameEn: 'Rakhia Bari', category: 'पापड़', price: 480, unit: Unit.KG },
+  { nameHi: 'बीजोरी', nameEn: 'Beejori', category: 'पापड़', price: 460, unit: Unit.KG },
+  { nameHi: 'लाई बड़ी', nameEn: 'Lai Bari', category: 'पापड़', price: 360, unit: Unit.KG },
+  { nameHi: 'आलू साबूदाना पापड़', nameEn: 'Aloo Sabudana Papad', category: 'पापड़', price: 110, unit: Unit.PACKET },
+  { nameHi: 'आलू साबूदाना मुरकू', nameEn: 'Aloo Sabudana Murku', category: 'पापड़', price: 110, unit: Unit.PACKET },
+
+  // CATEGORY: नमकीन
+  { nameHi: 'मिसीपूरी खाखरा', nameEn: 'Misipuri Khakhra', category: 'नमकीन', price: 130, unit: Unit.DABBA },
+  { nameHi: 'चोराफली नमकीन', nameEn: 'Chorafali Namkeen', category: 'नमकीन', price: 110, unit: Unit.DABBA },
+  { nameHi: 'मेथी पपड़ी (सुवाली)', nameEn: 'Methi Papdi (Suwali)', category: 'नमकीन', price: 300, unit: Unit.PACKET },
+  { nameHi: 'चाकोली', nameEn: 'Chakoli', category: 'नमकीन', price: 320, unit: Unit.PACKET },
+  { nameHi: 'आलू स्टीक', nameEn: 'Aloo Stick', category: 'नमकीन', price: 320, unit: Unit.PACKET },
+  { nameHi: 'सलोनी', nameEn: 'Saloni', category: 'नमकीन', price: 300, unit: Unit.PACKET },
+  { nameHi: 'मैदा साबूदाना पपड़ी', nameEn: 'Maida Sabudana Papdi', category: 'नमकीन', price: 100, unit: Unit.PACKET },
+  { nameHi: 'पोहा चिड़वा (चूड़ा)', nameEn: 'Poha Chidwa (Choora)', category: 'नमकीन', price: 300, unit: Unit.PACKET },
+  { nameHi: 'मिक्चर पोपकोंन', nameEn: 'Mixture Popcorn', category: 'नमकीन', price: 300, unit: Unit.PACKET },
+  { nameHi: 'कचोड़ी', nameEn: 'Kachori', category: 'नमकीन', price: 100, unit: Unit.PACKET },
+  { nameHi: 'चाट पपड़ी प्लेन', nameEn: 'Chaat Papdi Plain', category: 'नमकीन', price: 300, unit: Unit.PACKET },
+  { nameHi: 'निमकी (डायमंड शेप)', nameEn: 'Nimki (Diamond Shape)', category: 'नमकीन', price: 300, unit: Unit.PACKET },
+  { nameHi: 'मेथी मठरी', nameEn: 'Methi Mathri', category: 'नमकीन', price: 400, unit: Unit.PACKET },
+  { nameHi: 'मुंग चूर', nameEn: 'Moong Choor', category: 'नमकीन', price: 300, unit: Unit.PACKET },
+  { nameHi: 'चना चूर', nameEn: 'Chana Choor', category: 'नमकीन', price: 300, unit: Unit.PACKET },
+  { nameHi: 'चना दाल', nameEn: 'Chana Dal', category: 'नमकीन', price: 300, unit: Unit.PACKET },
+  { nameHi: 'भुजिया', nameEn: 'Bhujia', category: 'नमकीन', price: 300, unit: Unit.KG },
+  { nameHi: 'भाखरबड़ी (प्लेन / लहसुन)', nameEn: 'Bhakarwadi (Plain / Lahsun)', category: 'नमकीन', price: 300, unit: Unit.PACKET, variants: ['प्लेन', 'लहसुन'] },
+  { nameHi: 'चाट कटोरी (10 नग)', nameEn: 'Chaat Katori (10 Units)', category: 'अन्य', price: 200, unit: Unit.PIECE },
+  { nameHi: 'मीठा पेठा', nameEn: 'Meetha Petha', category: 'नमकीन', price: 300, unit: Unit.PACKET },
+  { nameHi: 'सकरपारा', nameEn: 'Shakarpara', category: 'नमकीन', price: 300, unit: Unit.PACKET },
+  { nameHi: 'खजूर ड्राई फ्रूट्स लड्डू', nameEn: 'Khajur Dry Fruits Laddu', category: 'नमकीन', price: 760, unit: Unit.PACKET },
+  { nameHi: 'गूंद गिरी लड्डू', nameEn: 'Gund Giri Laddu', category: 'नमकीन', price: 700, unit: Unit.KG },
+  { nameHi: 'गुजिया', nameEn: 'Gujia', category: 'नमकीन', price: 900, unit: Unit.KG },
+  { nameHi: 'आम पापड़ मीठा', nameEn: 'Aam Papad Meetha', category: 'नमकीन', price: 400, unit: Unit.KG },
+  { nameHi: 'आम पापड़ नमकीन', nameEn: 'Aam Papad Namkeen', category: 'नमकीन', price: 440, unit: Unit.KG },
+  { nameHi: 'खाखरा', nameEn: 'Khakhra', category: 'नमकीन', price: 80, unit: Unit.PACKET, variants: ['मेथी', 'जीरा', 'मूंग अजवाइन', 'पंजाबी तड़का', 'सेजवान', 'मैजिक मसाला', 'गोलगप्पा', 'पावभाजी'] },
+
+  // CATEGORY: अन्य
+  { nameHi: 'हींग स्टॉन्ग', nameEn: 'Hing Strong', category: 'अन्य', price: 320, unit: Unit.BOTTLE },
+];

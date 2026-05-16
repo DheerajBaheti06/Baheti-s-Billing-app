@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A product for sale in the shop",
+      "type": "object",
+      "properties": {
+        "nameHi": { "type": "string", "description": "Name in Hindi" },
+        "nameEn": { "type": "string", "description": "Name in English" },
+        "category": { "type": "string", "description": "Product category" },
+        "price": { "type": "number", "description": "Price per unit" },
+        "unit": { "type": "string", "description": "Base unit (kg, packet, piece, bottle, box)" },
+        "variants": { "type": "array", "description": "Available flavors or variants" }
+      },
+      "required": ["nameHi", "nameEn", "category", "price", "unit"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "A customer of the shop",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Customer name" },
+        "phone": { "type": "string", "description": "Customer phone number" },
+        "pendingBalance": { "type": "number", "description": "Amount owed by customer" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name"]
+    },
+    "Bill": {
+      "title": "Bill",
+      "description": "An invoice for a sale",
+      "type": "object",
+      "properties": {
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "productId": { "type": "string" },
+              "name": { "type": "string" },
+              "quantity": { "type": "number" },
+              "unit": { "type": "string" },
+              "price": { "type": "number" },
+              "total": { "type": "number" },
+              "variant": { "type": "string" }
+            }
+          }
+        },
+        "subtotal": { "type": "number" },
+        "previousBalance": { "type": "number" },
+        "finalTotal": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["customerName", "items", "subtotal", "finalTotal", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/products": {
+      "schema": "Product",
+      "description": "Collection of products"
+    },
+    "/customers": {
+      "schema": "Customer",
+      "description": "Collection of customers"
+    },
+    "/bills": {
+      "schema": "Bill",
+      "description": "Collection of bills"
+    }
+  }
+}

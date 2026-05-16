@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@400;700;900&family=JetBrains+Mono:wght@400;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: var(--primary);
+  --font-sans: var(--font-family);
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+:root {
+  --primary: #ea580c;
+  --primary-shadow: rgba(234, 88, 12, 0.2);
+  --font-family: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  @apply bg-white text-gray-900 transition-colors duration-300;
+}
+
+/* Dark mode basic setup */
+.dark body {
+  @apply bg-gray-950 text-gray-50;
+}
+
+@layer base {
+  body {
+    -webkit-tap-highlight-color: transparent;
+  }
+  input[type="date"] {
+    accent-color: var(--primary);
+    color-scheme: light dark;
+  }
+  ::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 2px;
+  }
+  .dark ::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  .receipt-print-container, .receipt-print-container * {
+    visibility: visible !important;
+  }
+  .receipt-print-container {
+    position: absolute !important;
+    left: 50% !important;
+    top: 0 !important;
+    transform: translateX(-50%) !important;
+    width: 380px !important;
+    height: auto !important;
+    background: white !important;
+    display: block !important;
+    z-index: 9999 !important;
+  }
+  /* Force light theme colors for printing */
+  .dark .receipt-print-container {
+    background: white !important;
+    color: #000 !important;
+  }
+  /* More specific overrides for detail view when printing */
+  .receipt-print-container .text-white {
+    color: white !important;
+  }
+  .receipt-print-container .bg-\[#002e6e\] {
+    background-color: #002e6e !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .receipt-print-container .bg-\[#00baf2\] {
+    background-color: #00baf2 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    margin: 0;
+    size: auto;
+  }
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
