@@ -4,6 +4,7 @@ import { Search, Plus, User, Phone, Wallet, ChevronRight } from 'lucide-react';
 import { formatCurrency, cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { Customer } from '../types';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 const CustomersPage = () => {
   const { customers, loading, addCustomer, updateCustomer } = useCustomers();
@@ -13,6 +14,9 @@ const CustomersPage = () => {
   const [showConfirmUpdate, setShowConfirmUpdate] = useState(false);
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
+
+  // Lock scroll when add/edit customer modal is open
+  useScrollLock(isAdding || !!editingCustomer);
 
   const filteredCustomers = customers.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

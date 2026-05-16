@@ -70,7 +70,11 @@ export const translations = {
     billLabels: "Bill Labels",
     addLabelPlaceholder: "Add new label...",
     labelAdded: "Label Added",
-    labelRemoved: "Label Removed"
+    labelRemoved: "Label Removed",
+    courierCharge: "Courier Charge",
+    pendingAmount: "Pending Amount",
+    courier: "Courier",
+    pending: "Pending"
   },
   hi: {
     appName: "बाहेती बिलिंग",
@@ -143,7 +147,11 @@ export const translations = {
     billLabels: "बिल स्टेटस लेबल",
     addLabelPlaceholder: "नया लेबल जोड़ें...",
     labelAdded: "लेबल जोड़ा गया",
-    labelRemoved: "लेबल हटाया गया"
+    labelRemoved: "लेबल हटाया गया",
+    courierCharge: "कूरियर शुल्क",
+    pendingAmount: "बकाया राशि",
+    courier: "कूरियर",
+    pending: "बकाया"
   },
   hinglish: {
     appName: "BAHETI BILLING",
@@ -216,7 +224,11 @@ export const translations = {
     billLabels: "Bill Status Labels",
     addLabelPlaceholder: "Naya label add karein...",
     labelAdded: "Label Add Ho Gaya",
-    labelRemoved: "Label Hat Gaya"
+    labelRemoved: "Label Hat Gaya",
+    courierCharge: "Courier Charge",
+    pendingAmount: "Baki Amount",
+    courier: "Courier",
+    pending: "Baki"
   }
 };
 

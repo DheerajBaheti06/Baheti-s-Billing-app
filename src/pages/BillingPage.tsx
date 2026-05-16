@@ -12,6 +12,7 @@ import 'jspdf-autotable';
 import { useTranslation } from '../hooks/useTranslation';
 import { useReceiptSharing } from '../hooks/useReceiptSharing';
 import { ReceiptCard } from '../components/ReceiptCard';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 import { Bill } from '../types';
 
@@ -34,6 +35,8 @@ const BillingPage: React.FC<BillingPageProps> = ({ initialBill, onClearDraft }) 
     items: BillItem[];
     subtotal: number;
     previousBalance: number;
+    courierCharge?: number;
+    manualPendingAmount?: number;
     finalTotal: number;
     date: string;
   } | null>(null);
@@ -41,9 +44,16 @@ const BillingPage: React.FC<BillingPageProps> = ({ initialBill, onClearDraft }) 
   const [customerSearch, setCustomerSearch] = useState('saman');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [items, setItems] = useState<BillItem[]>([]);
+  const [courierCharge, setCourierCharge] = useState<number>(0);
+  const [manualPendingAmount, setManualPendingAmount] = useState<number>(0);
+  const [showCourierInput, setShowCourierInput] = useState(false);
+  const [showPendingInput, setShowPendingInput] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [shareOnSave, setShareOnSave] = useState(false);
+
+  // Lock scroll when success modal is open
+  useScrollLock(isSuccess);
 
   useEffect(() => {
     seedProducts();
@@ -61,31 +71,29 @@ const BillingPage: React.FC<BillingPageProps> = ({ initialBill, onClearDraft }) 
   }, [initialBill, onClearDraft]);
 
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.total, 0), [items]);
-  const finalTotal = subtotal + (selectedCustomer?.pendingBalance || 0);
+  const finalTotal = subtotal + (selectedCustomer?.pendingBalance || 0) + courierCharge + manualPendingAmount;
 
   const handleAddProduct = (product: Product) => {
     const existingIndex = items.findIndex(item => item.productId === product.id && (!product.variants || item.variant === product.variants[0]));
     
-    if (existingIndex > -1 && !product.variants) {
-      const newItems = [...items];
-      newItems[existingIndex].quantity += (product.unit === Unit.KG ? 0.25 : 1);
-      newItems[existingIndex].total = newItems[existingIndex].quantity * newItems[existingIndex].price;
-      setItems(newItems);
-    } else {
-      const defaultQty = product.unit === Unit.KG ? 0.5 : 1;
-      const newItem: BillItem = {
-        productId: product.id,
-        name: product.nameHi,
-        nameEn: product.nameEn || '',
-        price: product.price,
-        quantity: defaultQty,
-        unit: product.unit,
-        total: product.price * defaultQty,
-        variant: product.variants?.[0] || '',
-        availableVariants: product.variants || []
-      };
-      setItems([newItem, ...items]);
+    if (existingIndex > -1) {
+      // If already exists, don't do anything (it will be disabled in UI anyway)
+      return;
     }
+
+    const defaultQty = product.unit === Unit.KG ? 0.5 : 1;
+    const newItem: BillItem = {
+      productId: product.id,
+      name: product.nameHi,
+      nameEn: product.nameEn || '',
+      price: product.price,
+      quantity: defaultQty,
+      unit: product.unit,
+      total: product.price * defaultQty,
+      variant: product.variants?.[0] || '',
+      availableVariants: product.variants || []
+    };
+    setItems([newItem, ...items]);
   };
 
   const handleUpdateItem = (index: number, updates: Partial<BillItem>) => {
@@ -128,6 +136,8 @@ const BillingPage: React.FC<BillingPageProps> = ({ initialBill, onClearDraft }) 
           items: sanitizedItems,
           subtotal,
           previousBalance: selectedCustomer?.pendingBalance || 0,
+          courierCharge,
+          manualPendingAmount,
           finalTotal,
           status: 'done'
         });
@@ -139,6 +149,8 @@ const BillingPage: React.FC<BillingPageProps> = ({ initialBill, onClearDraft }) 
           items: sanitizedItems,
           subtotal,
           previousBalance: selectedCustomer?.pendingBalance || 0,
+          courierCharge,
+          manualPendingAmount,
           finalTotal,
           status: 'done'
         });
@@ -149,12 +161,18 @@ const BillingPage: React.FC<BillingPageProps> = ({ initialBill, onClearDraft }) 
         items: [...items],
         subtotal,
         previousBalance: selectedCustomer?.pendingBalance || 0,
+        courierCharge,
+        manualPendingAmount,
         finalTotal,
         date: dateStr
       };
 
       setLastBill(billData);
       setItems([]);
+      setCourierCharge(0);
+      setManualPendingAmount(0);
+      setShowCourierInput(false);
+      setShowPendingInput(false);
       setSelectedCustomer(null);
       setCustomerSearch('saman');
       setIsSuccess(true);
@@ -202,7 +220,11 @@ const BillingPage: React.FC<BillingPageProps> = ({ initialBill, onClearDraft }) 
         </div>
         
         <div className="pt-2">
-          <ProductSearch products={products} onSelect={handleAddProduct} />
+          <ProductSearch 
+            products={products} 
+            currentItems={items.map(item => item.productId)}
+            onSelect={handleAddProduct} 
+          />
         </div>
       </div>
 
@@ -311,6 +333,53 @@ const BillingPage: React.FC<BillingPageProps> = ({ initialBill, onClearDraft }) 
             </motion.div>
           )}
         </div>
+
+        {/* Optional Charges Section */}
+        {items.length > 0 && (
+          <div className="flex flex-wrap gap-2 px-2 mt-4">
+            {!showCourierInput ? (
+              <button 
+                onClick={() => setShowCourierInput(true)}
+                className="text-[9px] font-black uppercase tracking-wider bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-3 py-2 rounded-xl border border-blue-100 dark:border-blue-900/30 active:scale-95 transition-all"
+              >
+                + {t('courierCharge') || 'Courier'}
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">{t('courier') || 'Courier'}</span>
+                <input 
+                  type="number"
+                  value={courierCharge || ''}
+                  onChange={(e) => setCourierCharge(parseFloat(e.target.value) || 0)}
+                  placeholder="0"
+                  className="w-16 bg-white dark:bg-gray-800 border-none rounded-lg py-1 px-2 text-xs font-black focus:ring-1 focus:ring-blue-400 outline-none text-blue-600"
+                />
+                <button onClick={() => { setCourierCharge(0); setShowCourierInput(false); }} className="text-blue-400">×</button>
+              </div>
+            )}
+
+            {!showPendingInput ? (
+              <button 
+                onClick={() => setShowPendingInput(true)}
+                className="text-[9px] font-black uppercase tracking-wider bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 px-3 py-2 rounded-xl border border-orange-100 dark:border-orange-900/30 active:scale-95 transition-all"
+              >
+                + {t('pendingAmount') || 'Pending'}
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 px-3 py-1.5 rounded-xl border border-orange-100 dark:border-orange-900/30">
+                <span className="text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest">{t('pending') || 'Pending'}</span>
+                <input 
+                  type="number"
+                  value={manualPendingAmount || ''}
+                  onChange={(e) => setManualPendingAmount(parseFloat(e.target.value) || 0)}
+                  placeholder="0"
+                  className="w-16 bg-white dark:bg-gray-800 border-none rounded-lg py-1 px-2 text-xs font-black focus:ring-1 focus:ring-orange-400 outline-none text-orange-600"
+                />
+                <button onClick={() => { setManualPendingAmount(0); setShowPendingInput(false); }} className="text-orange-400">×</button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Floating Summary Bar */}
@@ -422,6 +491,8 @@ const BillingPage: React.FC<BillingPageProps> = ({ initialBill, onClearDraft }) 
             items={lastBill.items}
             subtotal={lastBill.subtotal}
             previousBalance={lastBill.previousBalance}
+            courierCharge={lastBill.courierCharge}
+            manualPendingAmount={lastBill.manualPendingAmount}
             finalTotal={lastBill.finalTotal}
             date={lastBill.date}
           />

@@ -26,6 +26,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useReceiptSharing } from '../hooks/useReceiptSharing';
 import { ReceiptCard } from '../components/ReceiptCard';
 import { useSettings } from '../context/SettingsContext';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 interface HistoryPageProps {
   onEdit?: (bill: Bill) => void;
@@ -47,6 +48,9 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const receiptRef = React.useRef<HTMLDivElement>(null);
+
+  // Lock scroll when bill is selected
+  useScrollLock(!!selectedBill);
 
   const filteredBills = bills.filter(bill => {
     const matchesSearch = bill.customerName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -110,6 +114,8 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit }) => {
     items: selectedBill.items,
     subtotal: selectedBill.subtotal,
     previousBalance: selectedBill.previousBalance,
+    courierCharge: selectedBill.courierCharge,
+    manualPendingAmount: selectedBill.manualPendingAmount,
     finalTotal: selectedBill.finalTotal,
     date: billDateStr
   } : null;
@@ -417,6 +423,18 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit }) => {
                         <span>+{formatCurrency(selectedBill.previousBalance)}</span>
                       </div>
                     )}
+                    {selectedBill.courierCharge && selectedBill.courierCharge > 0 ? (
+                      <div className="flex justify-between text-[9px] text-blue-500 font-black uppercase tracking-widest">
+                        <span>{t('courierCharge')}</span>
+                        <span>+{formatCurrency(selectedBill.courierCharge)}</span>
+                      </div>
+                    ) : null}
+                    {selectedBill.manualPendingAmount && selectedBill.manualPendingAmount > 0 ? (
+                      <div className="flex justify-between text-[9px] text-orange-600 font-black uppercase tracking-widest">
+                        <span>{t('pendingAmount')}</span>
+                        <span>+{formatCurrency(selectedBill.manualPendingAmount)}</span>
+                      </div>
+                    ) : null}
                     <div className="flex justify-between items-end pt-2 mt-2 border-t border-gray-200 dark:border-gray-700">
                       <span className="font-black text-gray-900 dark:text-gray-100 text-xs uppercase tracking-widest">{t('totalPaid')}</span>
                       <span className="font-black text-xl text-primary leading-none tracking-tighter">{formatCurrency(selectedBill.finalTotal)}</span>
@@ -503,6 +521,8 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit }) => {
             items={shareData.items}
             subtotal={shareData.subtotal}
             previousBalance={shareData.previousBalance}
+            courierCharge={selectedBill.courierCharge}
+            manualPendingAmount={selectedBill.manualPendingAmount}
             finalTotal={shareData.finalTotal}
             date={shareData.date}
           />

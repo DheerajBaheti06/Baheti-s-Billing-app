@@ -46,6 +46,8 @@ export interface Bill {
   items: BillItem[];
   subtotal: number;
   previousBalance: number;
+  courierCharge?: number;
+  manualPendingAmount?: number;
   finalTotal: number;
   status?: string;
   timestamp: any; // Firestore timestamp

@@ -4,16 +4,21 @@ import { Search, Plus, X } from 'lucide-react';
 import { Product } from '../types';
 import { cn } from '../lib/utils';
 import { useTranslation } from '../hooks/useTranslation';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 interface ProductSearchProps {
   products: Product[];
+  currentItems: string[]; // List of product IDs already in the basket
   onSelect: (product: Product) => void;
 }
 
-const ProductSearch: React.FC<ProductSearchProps> = ({ products, onSelect }) => {
+const ProductSearch: React.FC<ProductSearchProps> = ({ products, currentItems, onSelect }) => {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
+
+  // Lock background scroll when search results are open
+  useScrollLock(isOpen && query.length > 0);
 
   const fuse = useMemo(() => {
     return new Fuse(products, {
@@ -80,29 +85,43 @@ const ProductSearch: React.FC<ProductSearchProps> = ({ products, onSelect }) => 
 
       {isOpen && results.length > 0 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800 z-50 max-h-80 overflow-y-auto overflow-x-hidden">
-          {results.map((product) => (
-            <button
-              key={product.id}
-              onClick={() => {
-                onSelect(product);
-                setQuery('');
-                setIsOpen(false);
-              }}
-              className="w-full flex flex-col p-4 text-left border-b border-gray-50 dark:border-gray-800 last:border-0 hover:bg-primary/5 transition-colors active:bg-primary/10"
-            >
-              <div className="flex justify-between items-start gap-2">
-                <div className="flex-1">
-                  <span className="font-bold text-gray-900 dark:text-gray-100 text-sm leading-tight block">{product.nameHi}</span>
-                  <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium leading-none block mt-0.5">{product.nameEn}</span>
+          {results.map((product) => {
+            const isAdded = currentItems.includes(product.id);
+            return (
+              <button
+                key={product.id}
+                disabled={isAdded}
+                onClick={() => {
+                  onSelect(product);
+                  setQuery('');
+                  setIsOpen(false);
+                }}
+                className={cn(
+                  "w-full flex flex-col p-4 text-left border-b border-gray-50 dark:border-gray-800 last:border-0 transition-colors",
+                  isAdded ? "opacity-60 bg-gray-50 cursor-not-allowed" : "hover:bg-primary/5 active:bg-primary/10"
+                )}
+              >
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-gray-900 dark:text-gray-100 text-sm leading-tight">{product.nameHi}</span>
+                      {isAdded && (
+                        <span className="text-[8px] font-black uppercase bg-green-100 text-green-600 px-1.5 py-0.5 rounded">
+                          Added
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium leading-none block mt-0.5">{product.nameEn}</span>
+                  </div>
+                  <span className="text-primary font-black shrink-0">₹{product.price}</span>
                 </div>
-                <span className="text-primary font-black shrink-0">₹{product.price}</span>
-              </div>
-              <div className="flex justify-between items-center mt-1.5">
-                <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{product.category}</span>
-                <span className="text-[10px] font-bold text-gray-300 dark:text-gray-600 uppercase shrink-0">per {product.unit}</span>
-              </div>
-            </button>
-          ))}
+                <div className="flex justify-between items-center mt-1.5">
+                  <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{product.category}</span>
+                  <span className="text-[10px] font-bold text-gray-300 dark:text-gray-600 uppercase shrink-0">per {product.unit}</span>
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

@@ -9,6 +9,8 @@ interface ShareData {
   items: any[];
   subtotal: number;
   previousBalance: number;
+  courierCharge?: number;
+  manualPendingAmount?: number;
   finalTotal: number;
   date: string;
 }
@@ -25,6 +27,8 @@ export const useReceiptSharing = () => {
                  `*Items:*\n${itemsText}\n\n` +
                  `Subtotal: ₹${data.subtotal}\n` +
                  (data.previousBalance > 0 ? `Prev Balance: ₹${data.previousBalance}\n` : '') +
+                 (data.courierCharge ? `Courier Chg: ₹${data.courierCharge}\n` : '') +
+                 (data.manualPendingAmount ? `Added Pending: ₹${data.manualPendingAmount}\n` : '') +
                  `*Total Paid: ₹${data.finalTotal}*\n\n` +
                  `Thank you!`;
 

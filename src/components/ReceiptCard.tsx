@@ -8,6 +8,8 @@ interface ReceiptCardProps {
   items: BillItem[];
   subtotal: number;
   previousBalance: number;
+  courierCharge?: number;
+  manualPendingAmount?: number;
   finalTotal: number;
   date: string;
 }
@@ -17,6 +19,8 @@ export const ReceiptCard = React.forwardRef<HTMLDivElement, ReceiptCardProps>(({
   items, 
   subtotal, 
   previousBalance, 
+  courierCharge = 0,
+  manualPendingAmount = 0,
   finalTotal,
   date
 }, ref) => {
@@ -100,6 +104,18 @@ export const ReceiptCard = React.forwardRef<HTMLDivElement, ReceiptCardProps>(({
               <span>+{formatCurrency(previousBalance)}</span>
             </div>
           )}
+          {courierCharge > 0 && (
+            <div className="flex justify-between text-blue-500 font-bold text-[11px] uppercase tracking-widest">
+              <span>Courier Charges</span>
+              <span>+{formatCurrency(courierCharge)}</span>
+            </div>
+          )}
+          {manualPendingAmount > 0 && (
+            <div className="flex justify-between text-orange-600 font-bold text-[11px] uppercase tracking-widest">
+              <span>Added Pending Amount</span>
+              <span>+{formatCurrency(manualPendingAmount)}</span>
+            </div>
+          )}
           <div className="flex justify-between pt-4 border-t border-gray-50 items-center">
             <div className="flex flex-col">
               <span className="text-[10px] font-bold text-[#002e6e] uppercase tracking-widest leading-none mb-1">Total Amount</span>
@@ -110,17 +126,6 @@ export const ReceiptCard = React.forwardRef<HTMLDivElement, ReceiptCardProps>(({
         </div>
 
         <div className="pt-8 flex flex-col items-center gap-6">
-          <div className="w-full flex justify-between items-center px-2">
-            <div className="flex flex-col">
-              <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-4">Receiver's Signature</p>
-              <div className="w-24 h-[1px] bg-gray-200" />
-            </div>
-            <div className="flex flex-col items-end">
-              <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mb-4">Authorized Signatory</p>
-              <div className="w-24 h-[1px] bg-gray-200" />
-            </div>
-          </div>
-
           <div className="text-center space-y-2 border-t border-gray-50 pt-6 w-full">
             <p className="text-[10px] font-black text-[#002e6e] uppercase tracking-[0.3em]">Thank You for your visit!</p>
             <p className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.15em]">Visit Again for Pure & Quality Products</p>

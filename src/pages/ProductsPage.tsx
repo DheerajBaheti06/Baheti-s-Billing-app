@@ -9,6 +9,7 @@ import { db } from '../lib/firebase';
 import { doc, deleteDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useTranslation } from '../hooks/useTranslation';
 import { ProductIcon } from '../components/ProductIcon';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 const ProductsPage = () => {
   const { products, loading, seedProducts } = useProducts();
@@ -25,6 +26,9 @@ const ProductsPage = () => {
   // Add/Edit State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Lock scroll when modal is open
+  useScrollLock(isModalOpen);
   const [formData, setFormData] = useState({
     nameHi: '',
     nameEn: '',
