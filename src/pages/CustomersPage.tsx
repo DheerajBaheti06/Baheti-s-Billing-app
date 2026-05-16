@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useCustomers } from '../hooks/useCustomers';
 import { Search, Plus, User, Phone, Wallet, ChevronRight } from 'lucide-react';
 import { formatCurrency, cn } from '../lib/utils';
@@ -15,8 +15,14 @@ const CustomersPage = () => {
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
 
-  // Lock scroll when add/edit customer modal is open
+  // Lock scroll when modals are open
   useScrollLock(isAdding || !!editingCustomer);
+
+  const stats = useMemo(() => {
+    const totalDue = customers.reduce((sum, c) => sum + (c.pendingBalance || 0), 0);
+    const customersWithDue = customers.filter(c => c.pendingBalance > 0).length;
+    return { totalDue, customersWithDue };
+  }, [customers]);
 
   const filteredCustomers = customers.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -56,20 +62,39 @@ const CustomersPage = () => {
   if (loading) return <div className="p-8 text-center text-gray-500">Loading...</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-2xl font-black text-gray-900 leading-tight">Customer List</h2>
+        <h2 className="text-2xl font-black text-gray-900 leading-tight">Customers</h2>
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search customers..."
-          className="w-full bg-white border border-gray-200 rounded-2xl py-4 pl-12 pr-4 text-base focus:ring-2 focus:ring-orange-500 outline-none shadow-sm"
-        />
+      {/* Summary Card */}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-gray-900 rounded-[32px] p-6 text-white shadow-xl flex items-center justify-between overflow-hidden relative"
+      >
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16" />
+        <div className="relative z-10">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-50 mb-1">Total Outstanding</p>
+          <h3 className="text-3xl font-black tracking-tighter">₹{stats.totalDue.toLocaleString('en-IN')}</h3>
+          <p className="text-[9px] font-bold opacity-40 uppercase mt-2 tracking-widest">{stats.customersWithDue} Customers with Due</p>
+        </div>
+        <div className="relative z-10 w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
+          <Wallet className="w-6 h-6 text-white" />
+        </div>
+      </motion.div>
+
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search customers..."
+            className="w-full bg-white border border-gray-100 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold focus:ring-2 focus:ring-orange-500 outline-none shadow-sm"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-3">
@@ -77,14 +102,14 @@ const CustomersPage = () => {
           <div 
             key={customer.id}
             onClick={() => handleEditClick(customer)}
-            className="bg-white p-5 rounded-[32px] border border-gray-100 shadow-sm flex items-center justify-between group active:scale-[0.98] transition-all cursor-pointer"
+            className="bg-white p-5 rounded-[32px] border border-gray-100 dark:border-gray-800 shadow-sm flex items-center justify-between group active:scale-[0.98] transition-all cursor-pointer"
           >
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600">
+              <div className="w-14 h-14 bg-orange-100 dark:bg-orange-900/20 rounded-2xl flex items-center justify-center text-orange-600">
                 <User className="w-7 h-7" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-bold text-gray-900 text-lg leading-none">{customer.name}</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white text-lg leading-none">{customer.name}</h3>
                 <p className="text-xs text-gray-400 font-medium flex items-center gap-1">
                   <Phone className="w-3 h-3" />
                   {customer.phone || 'No phone'}
@@ -105,7 +130,11 @@ const CustomersPage = () => {
         ))}
 
         {filteredCustomers.length === 0 && (
-          <div className="py-20 text-center text-gray-400 font-medium">कोई ग्राहक नहीं मिला</div>
+          <div className="py-20 text-center">
+            <p className="text-gray-300 font-black uppercase text-[10px] tracking-widest leading-loose">
+              No records found
+            </p>
+          </div>
         )}
       </div>
 

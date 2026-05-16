@@ -74,7 +74,16 @@ export const translations = {
     courierCharge: "Courier Charge",
     pendingAmount: "Pending Amount",
     courier: "Courier",
-    pending: "Pending"
+    pending: "Pending",
+    dashboard: "Dashboard",
+    todaySales: "Today's Sales",
+    monthly: "Monthly",
+    outstanding: "Outstanding",
+    topProducts: "Top Products",
+    totalOrders: "Total Orders",
+    bills: "Bills",
+    customers: "Customers",
+    products: "Products"
   },
   hi: {
     appName: "बाहेती बिलिंग",
@@ -151,7 +160,16 @@ export const translations = {
     courierCharge: "कूरियर शुल्क",
     pendingAmount: "बकाया राशि",
     courier: "कूरियर",
-    pending: "बकाया"
+    pending: "बकाया",
+    dashboard: "डैशबोर्ड",
+    todaySales: "आज की बिक्री",
+    monthly: "मासिक",
+    outstanding: "कुल बकाया",
+    topProducts: "मुख्य आइटम",
+    totalOrders: "कुल ऑर्डर",
+    bills: "बिल",
+    customers: "ग्राहक",
+    products: "आइटम"
   },
   hinglish: {
     appName: "BAHETI BILLING",
@@ -228,7 +246,16 @@ export const translations = {
     courierCharge: "Courier Charge",
     pendingAmount: "Baki Amount",
     courier: "Courier",
-    pending: "Baki"
+    pending: "Baki",
+    dashboard: "Dashboard",
+    todaySales: "Aaj Ki Sales",
+    monthly: "Monthly",
+    outstanding: "Total Baki",
+    topProducts: "Top Items",
+    totalOrders: "Total Orders",
+    bills: "Bills",
+    customers: "Customers",
+    products: "Items"
   }
 };
 

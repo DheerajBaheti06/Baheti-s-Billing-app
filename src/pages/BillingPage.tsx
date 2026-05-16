@@ -24,7 +24,7 @@ interface BillingPageProps {
 const BillingPage: React.FC<BillingPageProps> = ({ initialBill, onClearDraft }) => {
   const { products, seedProducts } = useProducts();
   const { customers } = useCustomers();
-  const { addBill, updateBill } = useBills();
+  const { bills, addBill, updateBill } = useBills();
   const { t } = useTranslation();
   const { handleShareText, handleShareImage, generatePDF } = useReceiptSharing();
 

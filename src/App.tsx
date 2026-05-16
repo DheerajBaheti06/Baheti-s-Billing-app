@@ -2,21 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SettingsProvider } from './context/SettingsContext';
-import { LogIn, PlusCircle, History, Package, LogOut, ReceiptText, Settings } from 'lucide-react';
+import { LogIn, PlusCircle, History, Package, LogOut, ReceiptText, Settings, LayoutDashboard, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from './lib/utils';
 import { useTranslation } from './hooks/useTranslation';
 
 // Pages
+import DashboardPage from './pages/DashboardPage';
 import BillingPage from './pages/BillingPage';
 import ProductsPage from './pages/ProductsPage';
 import HistoryPage from './pages/HistoryPage';
+import CustomersPage from './pages/CustomersPage';
 import SettingsPage from './pages/SettingsPage';
 import { Bill } from './types';
 
 function AppContent() {
   const { user, loading, loginAsAdmin, loginAsGuest, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'billing' | 'history' | 'catalog' | 'settings'>('billing');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'billing' | 'history' | 'catalog' | 'settings'>('dashboard');
+  const [historyFilter, setHistoryFilter] = useState<string | 'all'>('all');
   const [draftBill, setDraftBill] = useState<Bill | null>(null);
   const [mpin, setMpin] = useState('');
   const [showMpinInput, setShowMpinInput] = useState(false);
@@ -140,8 +143,16 @@ function AppContent() {
   }
 
   const allTabs = [
+    { id: 'dashboard', label: t('dashboard') || 'Home', icon: LayoutDashboard, component: <DashboardPage onNavigate={(tab, params) => {
+      if (tab === 'history' && params?.status) {
+        setHistoryFilter(params.status);
+      } else if (tab === 'history') {
+        setHistoryFilter('all');
+      }
+      setActiveTab(tab as any);
+    }} /> },
     { id: 'billing', label: t('newBill'), icon: PlusCircle, component: <BillingPage initialBill={draftBill} onClearDraft={() => setDraftBill(null)} /> },
-    { id: 'history', label: t('history'), icon: History, component: <HistoryPage onEdit={handleEditBill} /> },
+    { id: 'history', label: t('history'), icon: History, component: <HistoryPage onEdit={handleEditBill} initialStatus={historyFilter} onFilterChange={setHistoryFilter} /> },
     { id: 'catalog', label: t('catalog'), icon: Package, component: <ProductsPage /> },
     { id: 'settings', label: t('settings'), icon: Settings, component: <SettingsPage /> },
   ];

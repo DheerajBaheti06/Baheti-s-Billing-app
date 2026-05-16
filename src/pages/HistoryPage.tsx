@@ -30,9 +30,11 @@ import { useScrollLock } from '../hooks/useScrollLock';
 
 interface HistoryPageProps {
   onEdit?: (bill: Bill) => void;
+  initialStatus?: string | 'all';
+  onFilterChange?: (status: string | 'all') => void;
 }
 
-const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit }) => {
+const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit, initialStatus = 'all', onFilterChange }) => {
   const { bills, loading, deleteBill, updateBill } = useBills();
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -42,7 +44,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit }) => {
   const isAdmin = user?.role === 'admin';
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<string | 'all'>(initialStatus);
   const [dateFilter, setDateFilter] = useState('');
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -202,7 +204,10 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit }) => {
 
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide px-1">
           <button
-            onClick={() => setStatusFilter('all')}
+            onClick={() => {
+              setStatusFilter('all');
+              onFilterChange?.('all');
+            }}
             className={cn(
               "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap border transition-all",
               statusFilter === 'all' 
@@ -215,7 +220,10 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit }) => {
           {labels.map(label => (
             <button
               key={label}
-              onClick={() => setStatusFilter(label)}
+              onClick={() => {
+                setStatusFilter(label);
+                onFilterChange?.(label);
+              }}
               className={cn(
                 "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap border transition-all",
                 statusFilter === label 
