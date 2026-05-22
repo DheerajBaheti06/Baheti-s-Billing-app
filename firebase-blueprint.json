@@ -54,6 +54,14 @@
         "timestamp": { "type": "string", "format": "date-time" }
       },
       "required": ["customerName", "items", "subtotal", "finalTotal", "timestamp"]
+    },
+    "AppSetting": {
+      "title": "AppSetting",
+      "description": "Global settings parameters like branding or logo URLs",
+      "type": "object",
+      "properties": {
+        "logoUrl": { "type": "string" }
+      }
     }
   },
   "firestore": {
@@ -68,6 +76,10 @@
     "/bills": {
       "schema": "Bill",
       "description": "Collection of bills"
+    },
+    "/settings": {
+      "schema": "AppSetting",
+      "description": "Global config and settings"
     }
   }
 }

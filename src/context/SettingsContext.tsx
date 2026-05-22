@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 type Theme = 'light' | 'dark' | 'system';
 type AccentColor = 'orange' | 'blue' | 'green' | 'purple';
@@ -33,6 +35,23 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const saved = localStorage.getItem('billing-labels');
     return saved ? JSON.parse(saved) : ['pending', 'done', 'bank'];
   });
+
+  // Real-time synchronization from Firestore database setting
+  useEffect(() => {
+    const docRef = doc(db, 'settings', 'branding');
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (typeof data.logoUrl === 'string') {
+          setLogoUrl(data.logoUrl);
+        }
+      }
+    }, (error) => {
+      console.warn("Firestore settings read rejected or offline:", error);
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('billing-lang', language);
@@ -87,6 +106,17 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     document.documentElement.style.setProperty('--font-family', fonts[font]);
   }, [font]);
 
+  const updateLogoUrl = async (url: string) => {
+    const trimmed = url.trim();
+    setLogoUrl(trimmed);
+    localStorage.setItem('billing-logo-url', trimmed);
+    try {
+      await setDoc(doc(db, 'settings', 'branding'), { logoUrl: trimmed }, { merge: true });
+    } catch (e) {
+      console.error("Failed to persist brand logo to Firestore settings collection:", e);
+    }
+  };
+
   const addLabel = (l: string) => {
     if (!labels.includes(l)) {
       setLabels([...labels, l]);
@@ -98,7 +128,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   return (
-    <SettingsContext.Provider value={{ theme, accent, font, language, labels, logoUrl, setTheme, setAccent, setFont, setLanguage, setLogoUrl, addLabel, removeLabel }}>
+    <SettingsContext.Provider value={{ theme, accent, font, language, labels, logoUrl, setTheme, setAccent, setFont, setLanguage, setLogoUrl: updateLogoUrl, addLabel, removeLabel }}>
       {children}
     </SettingsContext.Provider>
   );

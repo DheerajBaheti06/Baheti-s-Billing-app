@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useBills } from '../hooks/useBills';
-import { formatCurrency, cn } from '../lib/utils';
+import { formatCurrency, cn, parseTimestamp } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
 import { 
   Search, 
@@ -59,8 +59,9 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit, initialStatus = 'all'
     const matchesStatus = statusFilter === 'all' || bill.status === statusFilter;
     
     let matchesDate = true;
-    if (dateFilter && bill.timestamp?.toDate) {
-      const billDate = format(bill.timestamp.toDate(), 'yyyy-MM-dd');
+    const billDateObj = parseTimestamp(bill.timestamp);
+    if (dateFilter && billDateObj) {
+      const billDate = format(billDateObj, 'yyyy-MM-dd');
       matchesDate = billDate === dateFilter;
     }
     
@@ -68,8 +69,9 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit, initialStatus = 'all'
   });
 
   const groupedBillsByDate = filteredBills.reduce((groups: { [key: string]: Bill[] }, bill) => {
-    const date = bill.timestamp?.toDate 
-      ? format(bill.timestamp.toDate(), 'yyyy-MM-dd')
+    const billDateObj = parseTimestamp(bill.timestamp);
+    const date = billDateObj 
+      ? format(billDateObj, 'yyyy-MM-dd')
       : 'Processing';
     if (!groups[date]) groups[date] = [];
     groups[date].push(bill);
@@ -107,8 +109,9 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit, initialStatus = 'all'
     }
   };
 
-  const billDateStr = selectedBill?.timestamp?.toDate 
-    ? format(selectedBill.timestamp.toDate(), 'dd MMM, yyyy')
+  const selectedBillDate = parseTimestamp(selectedBill?.timestamp);
+  const billDateStr = selectedBillDate 
+    ? format(selectedBillDate, 'dd MMM, yyyy')
     : new Date().toLocaleDateString();
 
   const shareData = selectedBill ? {
@@ -310,7 +313,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit, initialStatus = 'all'
                       <div className="text-left overflow-hidden">
                         <h3 className="font-bold text-gray-900 dark:text-gray-100 truncate text-sm leading-tight">{bill.customerName}</h3>
                         <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">
-                          {bill.timestamp?.toDate ? format(bill.timestamp.toDate(), 'hh:mm a') : t('processing')}
+                          {parseTimestamp(bill.timestamp) ? format(parseTimestamp(bill.timestamp)!, 'hh:mm a') : t('processing')}
                         </p>
                       </div>
                     </div>
@@ -366,7 +369,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ onEdit, initialStatus = 'all'
                     <h3 className="text-xl font-black text-gray-900 dark:text-gray-100 mb-0.5 leading-tight">{selectedBill.customerName}</h3>
                     <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-2">
                       <Calendar className="w-3 h-3" />
-                      {selectedBill.timestamp?.toDate ? format(selectedBill.timestamp.toDate(), 'PPP, p') : t('processing')}
+                      {parseTimestamp(selectedBill.timestamp) ? format(parseTimestamp(selectedBill.timestamp)!, 'PPP, p') : t('processing')}
                     </p>
                   </div>
                   <button 

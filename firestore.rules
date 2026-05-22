@@ -53,5 +53,9 @@ service cloud.firestore {
       allow update: if isAdmin(); // Only admin can edit history
       allow delete: if isAdmin();
     }
+
+    match /settings/{settingId} {
+      allow read, write: if isSignedIn();
+    }
   }
 }

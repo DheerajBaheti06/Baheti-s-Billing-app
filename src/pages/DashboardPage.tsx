@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useBills } from '../hooks/useBills';
 import { useCustomers } from '../hooks/useCustomers';
 import { useProducts } from '../hooks/useProducts';
-import { formatCurrency, cn } from '../lib/utils';
+import { formatCurrency, cn, parseTimestamp } from '../lib/utils';
 import { 
   TrendingUp, 
   Package, 
@@ -88,8 +88,8 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
     }
 
     const filteredBills = bills.filter(b => {
-      if (!b.timestamp?.toDate) return false;
-      const date = b.timestamp.toDate();
+      const date = parseTimestamp(b.timestamp);
+      if (!date) return false;
       return isAfter(date, interval.start) && isBefore(date, interval.end);
     });
 
