@@ -41,7 +41,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
   const { customers, loading: customersLoading } = useCustomers();
   const { products, loading: productsLoading } = useProducts();
   const { t } = useTranslation();
-  const [selectedRange, setSelectedRange] = useState<DateRange>('today');
+  const [selectedRange, setSelectedRange] = useState<DateRange>('thisMonth');
   const [showRangePicker, setShowRangePicker] = useState(false);
 
   const stats = useMemo(() => {
@@ -96,11 +96,11 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
     const totalSales = filteredBills.reduce((sum, b) => sum + b.finalTotal, 0);
     
     const outstanding = filteredBills
-      .filter(b => b.status === 'pending')
+      .filter(b => b.status && b.status.toLowerCase().includes('pending'))
       .reduce((sum, b) => sum + b.finalTotal, 0);
       
     const bankReceived = filteredBills
-      .filter(b => b.status === 'bank')
+      .filter(b => b.status && b.status.toLowerCase().includes('bank'))
       .reduce((sum, b) => sum + b.finalTotal, 0);
 
     const productSales: { [key: string]: { name: string, count: number, revenue: number } } = {};

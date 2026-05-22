@@ -44,6 +44,15 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const data = docSnap.data();
         if (typeof data.logoUrl === 'string') {
           setLogoUrl(data.logoUrl);
+          localStorage.setItem('billing-logo-url', data.logoUrl);
+        }
+      } else {
+        // If the document doesn't exist on Firestore yet, but we already have a logoUrl locally, sync to Firestore
+        const localLogo = localStorage.getItem('billing-logo-url');
+        if (localLogo) {
+          setDoc(docRef, { logoUrl: localLogo }, { merge: true }).catch((err) => {
+            console.warn("Could not sync local setting to Firestore:", err);
+          });
         }
       }
     }, (error) => {
