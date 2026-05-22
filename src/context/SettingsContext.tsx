@@ -11,10 +11,12 @@ interface SettingsContextType {
   font: FontType;
   language: Language;
   labels: string[];
+  logoUrl: string;
   setTheme: (t: Theme) => void;
   setAccent: (a: AccentColor) => void;
   setFont: (f: FontType) => void;
   setLanguage: (l: Language) => void;
+  setLogoUrl: (url: string) => void;
   addLabel: (l: string) => void;
   removeLabel: (l: string) => void;
 }
@@ -26,6 +28,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [accent, setAccent] = useState<AccentColor>(() => (localStorage.getItem('billing-accent') as AccentColor) || 'orange');
   const [font, setFont] = useState<FontType>(() => (localStorage.getItem('billing-font') as FontType) || 'inter');
   const [language, setLanguage] = useState<Language>(() => (localStorage.getItem('billing-lang') as Language) || 'en');
+  const [logoUrl, setLogoUrl] = useState<string>(() => localStorage.getItem('billing-logo-url') || '');
   const [labels, setLabels] = useState<string[]>(() => {
     const saved = localStorage.getItem('billing-labels');
     return saved ? JSON.parse(saved) : ['pending', 'done', 'bank'];
@@ -34,6 +37,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     localStorage.setItem('billing-lang', language);
   }, [language]);
+
+  useEffect(() => {
+    localStorage.setItem('billing-logo-url', logoUrl);
+  }, [logoUrl]);
 
   useEffect(() => {
     localStorage.setItem('billing-labels', JSON.stringify(labels));
@@ -91,7 +98,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   return (
-    <SettingsContext.Provider value={{ theme, accent, font, language, labels, setTheme, setAccent, setFont, setLanguage, addLabel, removeLabel }}>
+    <SettingsContext.Provider value={{ theme, accent, font, language, labels, logoUrl, setTheme, setAccent, setFont, setLanguage, setLogoUrl, addLabel, removeLabel }}>
       {children}
     </SettingsContext.Provider>
   );

@@ -6,6 +6,7 @@ import { LogIn, PlusCircle, History, Package, LogOut, ReceiptText, Settings, Lay
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from './lib/utils';
 import { useTranslation } from './hooks/useTranslation';
+import { BrandLogo } from './components/BrandLogo';
 
 // Pages
 import DashboardPage from './pages/DashboardPage';
@@ -65,8 +66,8 @@ function AppContent() {
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-[40px] shadow-2xl p-10 text-center border border-gray-100 dark:border-gray-800"
         >
-          <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-            <ReceiptText className="w-8 h-8 text-primary" />
+          <div className="flex justify-center mb-6">
+            <BrandLogo size="xl" />
           </div>
           <h1 className="text-xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
             {t('appName')}
@@ -165,9 +166,7 @@ function AppContent() {
       {/* Header */}
       <header className="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 px-5 py-4 flex items-center justify-between z-30">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center shadow-md shadow-primary/20">
-            <ReceiptText className="w-4 h-4 text-white" />
-          </div>
+          <BrandLogo size="sm" showBorder={false} />
           <span className="font-black text-sm tracking-tight">{t('appName')}</span>
         </div>
         

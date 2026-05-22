@@ -12,7 +12,8 @@ import {
   Tag,
   Plus,
   Trash2,
-  Download
+  Download,
+  Image as ImageIcon
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { toast } from 'react-hot-toast';
@@ -20,12 +21,31 @@ import { cn } from '../lib/utils';
 import { useSettings } from '../context/SettingsContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { usePwaInstall } from '../hooks/usePwaInstall';
+import { BrandLogo } from '../components/BrandLogo';
 
 const SettingsPage = () => {
-  const { theme, accent, font, language, labels, setTheme, setAccent, setFont, setLanguage, addLabel, removeLabel } = useSettings();
+  const { theme, accent, font, language, labels, logoUrl, setTheme, setAccent, setFont, setLanguage, setLogoUrl, addLabel, removeLabel } = useSettings();
   const { t } = useTranslation();
   const [newLabel, setNewLabel] = React.useState('');
+  const [tempLogoUrl, setTempLogoUrl] = React.useState(logoUrl);
   const { isInstallable, isStandalone, installApp } = usePwaInstall();
+
+  // Keep temporary input state synced if changed elsewhere
+  React.useEffect(() => {
+    setTempLogoUrl(logoUrl);
+  }, [logoUrl]);
+
+  const handleSaveLogoUrl = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLogoUrl(tempLogoUrl.trim());
+    toast.success('Brand Logo Updated');
+  };
+
+  const handleClearLogoUrl = () => {
+    setLogoUrl('');
+    setTempLogoUrl('');
+    toast.success('Branding Reset to Default');
+  };
 
   const handleAddLabel = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,6 +98,80 @@ const SettingsPage = () => {
       </div>
 
       <div className="space-y-4 px-2">
+        {/* Brand Logo Card */}
+        <section className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+              <ImageIcon className="w-4 h-4" />
+            </div>
+            <h3 className="font-bold text-gray-900 dark:text-gray-100">Brand Logo Setup</h3>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-50 dark:bg-gray-800/40 p-4 rounded-2xl">
+            <BrandLogo size="md" />
+            <div className="text-center sm:text-left space-y-1">
+              <p className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-tight">Active Brand Icon</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold leading-normal">
+                Displayed in the login page, sidebar, sales receipts, and print templates.
+              </p>
+              <p className="text-[9px] text-primary/80 font-black uppercase tracking-wider">
+                {logoUrl ? '⚡ Custom Google Drive Logo loaded' : 'ℹ️ Standard default vector logo'}
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleSaveLogoUrl} className="space-y-3">
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1.5">
+                Google Drive Share URL / File ID
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={tempLogoUrl}
+                  onChange={(e) => setTempLogoUrl(e.target.value)}
+                  placeholder="Paste Google Drive share link here..."
+                  className="flex-1 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-750 px-4 py-3 rounded-2xl text-xs font-bold outline-none focus:border-primary text-gray-800 dark:text-gray-100 placeholder-gray-400 transition-all"
+                />
+                
+                {logoUrl && (
+                  <button
+                    type="button"
+                    onClick={handleClearLogoUrl}
+                    className="px-4 py-2 border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/20 text-red-500 hover:text-red-600 font-black text-[10px] uppercase tracking-widest rounded-2xl active:scale-95 transition-all text-center"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={tempLogoUrl.trim() === logoUrl}
+              className="w-full bg-primary disabled:opacity-50 text-white py-3 px-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2"
+            >
+              Update Brand Logo
+            </button>
+          </form>
+
+          <div className="bg-gray-50 dark:bg-gray-800/20 border border-gray-100 dark:border-gray-800 p-4 rounded-2xl text-[10px] space-y-1.5 font-bold text-gray-500 dark:text-gray-400 leading-relaxed">
+            <p className="uppercase tracking-widest text-[9px] text-primary mb-1">How to share from Google Drive:</p>
+            <p className="flex items-start gap-1">
+              <span className="text-primary font-bold">1.</span> Right-click or tap the image in your Google Drive.
+            </p>
+            <p className="flex items-start gap-1">
+              <span className="text-primary font-bold">2.</span> Click <span className="text-gray-700 dark:text-gray-200">Share</span> &gt; <span className="text-gray-700 dark:text-gray-200">Get link</span>.
+            </p>
+            <p className="flex items-start gap-1">
+              <span className="text-primary font-bold">3.</span> Under General Access, change to <span className="text-primary">"Anyone with the link"</span> (set as Viewer).
+            </p>
+            <p className="flex items-start gap-1">
+              <span className="text-primary font-bold">4.</span> Copy that link and paste it into the input field above!
+            </p>
+          </div>
+        </section>
+
         {/* Language */}
         <section className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm space-y-4">
           <div className="flex items-center gap-3">
