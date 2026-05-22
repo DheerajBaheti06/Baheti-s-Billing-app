@@ -11,18 +11,21 @@ import {
   Languages,
   Tag,
   Plus,
-  Trash2
+  Trash2,
+  Download
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { toast } from 'react-hot-toast';
 import { cn } from '../lib/utils';
 import { useSettings } from '../context/SettingsContext';
 import { useTranslation } from '../hooks/useTranslation';
+import { usePwaInstall } from '../hooks/usePwaInstall';
 
 const SettingsPage = () => {
   const { theme, accent, font, language, labels, setTheme, setAccent, setFont, setLanguage, addLabel, removeLabel } = useSettings();
   const { t } = useTranslation();
   const [newLabel, setNewLabel] = React.useState('');
+  const { isInstallable, isStandalone, installApp } = usePwaInstall();
 
   const handleAddLabel = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +60,15 @@ const SettingsPage = () => {
     setFont(newFont);
     toast.success('Typography Updated');
   }
+
+  const handleInstallClick = async () => {
+    const success = await installApp();
+    if (success) {
+      toast.success('App installed successfully!');
+    } else {
+      toast.error('Installation could not be completed.');
+    }
+  };
 
   return (
     <div className="space-y-6 pb-20">
@@ -239,6 +251,53 @@ const SettingsPage = () => {
                 {font === item.id && <Check className="w-5 h-5 text-primary" />}
               </button>
             ))}
+          </div>
+        </section>
+
+        {/* PWA Installation */}
+        <section className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+              <Download className="w-4 h-4" />
+            </div>
+            <h3 className="font-bold text-gray-900 dark:text-gray-100">{t('installApp') || 'Install Web App'}</h3>
+          </div>
+
+          <div className="space-y-3">
+            {isStandalone ? (
+              <div className="bg-green-50 dark:bg-green-950/20 text-green-600 dark:text-green-400 p-4 rounded-2xl border border-green-100 dark:border-green-905/40 text-xs font-bold flex items-center gap-2">
+                <Check className="w-4 h-4 shrink-0" />
+                <p>App is already installed and running in standalone mode!</p>
+              </div>
+            ) : isInstallable ? (
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-3 leading-relaxed">
+                  Install Baheti Billing App on your phone or desktop for instant access, stable offline billing, and a faster native experience directly from your home screen.
+                </p>
+                <button
+                  onClick={handleInstallClick}
+                  className="w-full bg-primary text-white py-3 px-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Install App Now
+                </button>
+              </div>
+            ) : (
+              <div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed mb-3">
+                  For quick mobile or desktop operations, run this bill generator directly as a native application.
+                </p>
+                <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 p-4 rounded-2xl text-[10px] space-y-1.5 font-bold text-gray-500 dark:text-gray-400">
+                  <p className="uppercase tracking-widest text-[9px] text-primary mb-1">Easy Launcher Steps:</p>
+                  <p className="flex items-start gap-1">
+                    <span className="text-primary font-bold">•</span> iOS Safari: Tap the <span className="text-gray-700 dark:text-gray-200">Share Arrow</span>, then scroll and select <span className="text-gray-700 dark:text-gray-200">"Add to Home Screen"</span>.
+                  </p>
+                  <p className="flex items-start gap-1">
+                    <span className="text-primary font-bold">•</span> Chrome/Desktop: Look for the <span className="text-gray-700 dark:text-gray-200">"Install" icon</span> inside the address bar, or open your browser config menu and select install.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 

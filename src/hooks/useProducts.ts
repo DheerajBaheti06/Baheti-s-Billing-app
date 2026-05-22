@@ -45,22 +45,6 @@ export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const q = query(collection(db, 'products'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const productList = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Product[];
-      setProducts(productList);
-      setLoading(false);
-    }, (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'products');
-    });
-
-    return unsubscribe;
-  }, []);
-
   const seedProducts = async (force = false) => {
     try {
       const snapshot = await getDocs(collection(db, 'products'));
@@ -95,6 +79,28 @@ export const useProducts = () => {
       console.error("Seeding error:", err);
     }
   };
+
+  useEffect(() => {
+    const q = query(collection(db, 'products'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const productList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Product[];
+      
+      setProducts(productList);
+      setLoading(false);
+
+      // Auto-trigger seeding if database is empty
+      if (productList.length === 0) {
+        seedProducts();
+      }
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'products');
+    });
+
+    return unsubscribe;
+  }, []);
 
   return { products, loading, seedProducts };
 };

@@ -83,7 +83,8 @@ export const translations = {
     totalOrders: "Total Orders",
     bills: "Bills",
     customers: "Customers",
-    products: "Products"
+    products: "Products",
+    installApp: "Install App"
   },
   hi: {
     appName: "बाहेती बिलिंग",
@@ -169,7 +170,8 @@ export const translations = {
     totalOrders: "कुल ऑर्डर",
     bills: "बिल",
     customers: "ग्राहक",
-    products: "आइटम"
+    products: "आइटम",
+    installApp: "ऐप इंस्टॉल करें"
   },
   hinglish: {
     appName: "BAHETI BILLING",
@@ -255,7 +257,8 @@ export const translations = {
     totalOrders: "Total Orders",
     bills: "Bills",
     customers: "Customers",
-    products: "Items"
+    products: "Items",
+    installApp: "App Install Karein"
   }
 };
 
