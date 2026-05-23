@@ -10,6 +10,7 @@ import { doc, deleteDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useTranslation } from '../hooks/useTranslation';
 import { ProductIcon } from '../components/ProductIcon';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { toast } from 'react-hot-toast';
 
 const ProductsPage = () => {
   const { products, loading, seedProducts } = useProducts();
@@ -22,6 +23,7 @@ const ProductsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isCleaning, setIsCleaning] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Add/Edit State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,7 +34,7 @@ const ProductsPage = () => {
   const [formData, setFormData] = useState({
     nameHi: '',
     nameEn: '',
-    price: 300,
+    price: '' as string | number,
     category: 'नमकीन',
     unit: Unit.KG
   });
@@ -41,7 +43,7 @@ const ProductsPage = () => {
 
   const handleOpenAdd = () => {
     setEditingProduct(null);
-    setFormData({ nameHi: '', nameEn: '', price: 300, category: 'नमकीन', unit: Unit.KG });
+    setFormData({ nameHi: '', nameEn: '', price: '', category: 'नमकीन', unit: Unit.KG });
     setIsModalOpen(true);
   };
 
@@ -50,45 +52,63 @@ const ProductsPage = () => {
     setFormData({ 
       nameHi: p.nameHi, 
       nameEn: p.nameEn, 
-      price: p.price, 
+      price: String(p.price), 
       category: p.category, 
-      unit: p.unit 
+      unit: p.unit as Unit
     });
     setIsModalOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsCleaning(true);
+    setIsSaving(true);
+    const toastId = toast.loading('Saving changes...');
     try {
       const id = editingProduct?.id || formData.nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const finalPrice = Math.max(0, Number(formData.price) || 0);
       await setDoc(doc(db, 'products', id), {
-        ...formData,
+        nameHi: formData.nameHi,
+        nameEn: formData.nameEn,
+        category: formData.category,
+        unit: formData.unit,
+        price: finalPrice,
         createdAt: editingProduct?.createdAt || serverTimestamp()
       }, { merge: true });
+      toast.success(editingProduct ? 'Product price updated successfully!' : 'Product added successfully to catalog!', { id: toastId });
       setIsModalOpen(false);
     } catch (err) {
       console.error(err);
+      toast.error('Failed to save product changes.', { id: toastId });
     } finally {
-      setIsCleaning(false);
+      setIsSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Delete this product from catalog?')) {
-      await deleteDoc(doc(db, 'products', id));
+      const toastId = toast.loading('Deleting product...');
+      try {
+        await deleteDoc(doc(db, 'products', id));
+        toast.success('Product deleted from catalog!', { id: toastId });
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to delete product from catalog.', { id: toastId });
+      }
     }
   };
 
   const handleReset = async () => {
     if (window.confirm('This will delete all current products. Continue?')) {
       setIsCleaning(true);
+      const toastId = toast.loading('Resetting catalog...');
       try {
         for (const p of products) {
           await deleteDoc(doc(db, 'products', p.id));
         }
+        toast.success('All catalog products deleted successfully!', { id: toastId });
       } catch (err) {
         console.error(err);
+        toast.error('Failed to reset catalog.', { id: toastId });
       } finally {
         setIsCleaning(false);
       }
@@ -97,8 +117,16 @@ const ProductsPage = () => {
 
   const handleSeed = async () => {
     setIsSeeding(true);
-    await seedProducts();
-    setIsSeeding(false);
+    const toastId = toast.loading('Loading default product prices...');
+    try {
+      await seedProducts();
+      toast.success('Default product catalogue loaded successfully!', { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to load default products.', { id: toastId });
+    } finally {
+      setIsSeeding(false);
+    }
   };
 
   const filteredProducts = products.filter(p => {
@@ -293,7 +321,13 @@ const ProductsPage = () => {
                       required
                       type="number"
                       value={formData.price}
-                      onChange={e => setFormData({...formData, price: Number(e.target.value)})}
+                      onChange={e => {
+                        setFormData({
+                          ...formData,
+                          price: e.target.value
+                        });
+                      }}
+                      placeholder="e.g. 320"
                       className="w-full bg-gray-50 dark:bg-gray-800 border-none rounded-xl py-3 px-4 font-bold text-sm focus:ring-2 focus:ring-primary outline-none transition-all dark:text-white"
                     />
                   </div>
@@ -322,10 +356,10 @@ const ProductsPage = () => {
 
               <button
                 type="submit"
-                disabled={isCleaning}
-                className="w-full bg-primary text-white font-black py-4 rounded-2xl flex items-center justify-center gap-2 mt-4 active:scale-95 transition-all shadow-lg"
+                disabled={isSaving}
+                className="w-full bg-primary text-white font-black py-4 rounded-2xl flex items-center justify-center gap-2 mt-4 active:scale-95 transition-all shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isCleaning ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                {isSaving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                 {editingProduct ? t('saveChanges') : t('addToCatalog')}
               </button>
             </motion.form>

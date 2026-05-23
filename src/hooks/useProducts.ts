@@ -80,6 +80,50 @@ export const useProducts = () => {
     }
   };
 
+  const autoMigratePrices = async (currentProducts: Product[]) => {
+    try {
+      const migKey = 'billing-products-price-update-2026-v12';
+      if (localStorage.getItem(migKey)) return;
+      
+      // Prevent overlapping runs instantly
+      localStorage.setItem(migKey, 'true');
+      
+      console.log("Analyzing product catalogue for price changes...");
+      const updates = [];
+      for (const initialProduct of INITIAL_PRODUCTS) {
+        const slug = `${initialProduct.category}-${initialProduct.nameEn}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const dbProd = currentProducts.find(p => p.id === slug);
+        if (!dbProd) {
+          // If product is missing, we need to create it
+          updates.push({ id: slug, data: initialProduct });
+        } else if (dbProd.price !== initialProduct.price) {
+          // If price differs, we update the price
+          updates.push({ id: slug, data: { ...dbProd, price: initialProduct.price } });
+        }
+      }
+
+      if (updates.length === 0) {
+        console.log("Product catalog matches latest prices.");
+        return;
+      }
+
+      console.log(`Syncing ${updates.length} products to updated prices in Firestore...`);
+      for (const update of updates) {
+        try {
+          await setDoc(doc(db, 'products', update.id), {
+            ...update.data,
+            updatedAt: serverTimestamp()
+          }, { merge: true });
+        } catch (e) {
+          console.warn(`Price sync failed for product slug ${update.id}:`, e);
+        }
+      }
+      console.log("Product prices successfully synchronized.");
+    } catch (err) {
+      console.error("Auto-migration error:", err);
+    }
+  };
+
   useEffect(() => {
     const q = query(collection(db, 'products'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -94,6 +138,9 @@ export const useProducts = () => {
       // Auto-trigger seeding if database is empty
       if (productList.length === 0) {
         seedProducts();
+      } else {
+        // Run non-destructive automatic price synchronization
+        autoMigratePrices(productList);
       }
     }, (error) => {
       handleFirestoreError(error, OperationType.LIST, 'products');
